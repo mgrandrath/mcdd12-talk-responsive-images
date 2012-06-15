@@ -1,0 +1,19 @@
+.deck-container small {
+  font-size: 75%;
+}
+
+.slide .inline {
+  display: inline;
+}
+
+.slide .right {
+  float: right;
+  margin-left: 2em;
+}
+
+.slide .no-bullets {
+  margin: 0;
+  padding: 0;
+  list-style-type: none;
+}
+

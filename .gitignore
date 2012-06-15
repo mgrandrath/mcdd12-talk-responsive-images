@@ -1,0 +1,6 @@
+*~
+*.bak
+*.orig
+.DS_Store
+.sass-cache/
+progress/

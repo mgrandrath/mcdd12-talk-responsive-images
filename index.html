@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<!--[if lt IE 7]> <html class="no-js ie6" lang="en"> <![endif]-->
+<!--[if IE 7]>    <html class="no-js ie7" lang="en"> <![endif]-->
+<!--[if IE 8]>    <html class="no-js ie8" lang="en"> <![endif]-->
+<!--[if gt IE 8]><!-->  <html class="no-js" lang="en"> <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+
+  <title>The state of responsive images</title>
+
+  <meta name="description" content="Ein Streifzug durch aktuelle Techniken, Bilder &quot;responsive&quot; zu machen">
+  <meta name="author" content="Martin Grandrath">
+  <meta name="viewport" content="width=1024, user-scalable=no">
+
+  <!-- Core and extension CSS files -->
+  <link rel="stylesheet" href="core/deck.core.css">
+  <link rel="stylesheet" href="extensions/goto/deck.goto.css">
+  <link rel="stylesheet" href="extensions/menu/deck.menu.css">
+  <link rel="stylesheet" href="extensions/navigation/deck.navigation.css">
+  <link rel="stylesheet" href="extensions/status/deck.status.css">
+  <link rel="stylesheet" href="extensions/hash/deck.hash.css">
+  <link rel="stylesheet" href="extensions/scale/deck.scale.css">
+
+  <!-- Style theme. More available in /themes/style/ or create your own. -->
+  <link rel="stylesheet" href="themes/style/swiss.css">
+  <link rel="stylesheet" href="css/custom.css">
+
+  <!-- Transition theme. More available in /themes/transition/ or create your own. -->
+  <link rel="stylesheet" href="themes/transition/horizontal-slide.css">
+
+  <script src="modernizr.custom.js"></script>
+</head>
+
+  <body class="deck-container">
+
+    <section class="slide" id="title-slide">
+      <h1>Responsive Images</h1>
+    </section>
+
+    <section class="slide">
+      <h2>Responsive Webdesign</h2>
+      <ul>
+        <li>Ein Markup für alle Plattformen</li>
+        <li>One Web</li>
+        <li>Gerüstet für noch nicht existierende Geräte</li>
+      </ul>
+    </section>
+
+    <section class="slide">
+      <h2>Bilder</h2>
+      <pre><code>img { max-width: 100; }</code></pre>
+      <ul>
+        <li>Auslieferung der größten benötigten Bildgröße an alle Geräte</li>
+        <li>Verschwendung von
+          <ul>
+            <li>Bandbreite</li>
+            <li>Rechenleistung</li>
+            <li>Speicherplatz</li>
+            <li>Akkulaufzeit</li>
+          </ul>
+        </li>
+      </ul>
+    </section>
+
+    <section class="slide">
+      <h2>Was responsive images leisten sollten</h2>
+      <div class="right">
+        <ul class="no-bullets">
+          <li><img class="inline" src="images/obama-500.jpg"></li>
+          <li>
+            <img class="inline" src="images/obama-100.jpg">
+            <img class="inline" src="images/obama-100-art.jpg">
+          </li>
+        </ul>
+        <small>
+          <a href="http://creativecommons.org/licenses/by-nc-sa/2.0/deed.en">CC BY-NC-SA 2.0</a> by
+          <a href="http://www.flickr.com/photos/barackobamadotcom/5795228030/">BarackObamaDotCom</a>
+        </small>
+      </div>
+      <ul>
+        <li>Keine überflüssigen Downloads</li>
+        <li>Keine Einschränkung wenn JavaScript oder Cookies nicht verfügbar sind</li>
+        <li>Caching via Proxies und CDNs</li>
+        <li>Unterschiedliche Bildausschnitte / Seitenverhältnisse</li>
+        <li>Nicht nur Displaygröße berücksichtigen
+          <ul>
+            <li>Art der Verbindung</li>
+            <li>Geschwindigkeit</li>
+            <li>Kosten (Volumentarif)</li>
+            <li>Benutzereinstellungen</li>
+          </ul>
+        </li>
+      </ul>
+    </section>
+
+    <section class="slide">
+      <h2 class="vcenter">Die Gegenwart</h2>
+    </section>
+
+    <section class="slide">
+      <h2>&lt;base&gt;-Tag</h2>
+      <pre><code>var assetSubdomain = null;
+if (screen.width &lt; 480){
+  assetSubdomain = 'small';
+  // ... more sizes
+} else {
+  assetSubdomain = 'large';
+}
+document.write('&lt;base href="//' + assetSubdomain + '-images.' + location.host + '/"&gt;');</code></pre>
+      <ul>
+        <li>Relative Referenzen auf Bilder</li>
+        <li>Komplexe Serverkonfiguration</li>
+        <li>Race condition</li>
+      </ul>
+    </section>
+
+    <section class="slide">
+      <h2>Cookies</h2>
+      <pre><code>document.cookie = "device_dimensions=" + screen.width + "x" + screen.height;</code></pre>
+      <ul>
+        <li>Requests für Bilder enthalten Cookie</li>
+        <li>Server liefert Bilder in Abhängigkeit des Cookies aus</li>
+        <li>Race condition &rarr;&nbsp;Multiple Downloads</li>
+        <li>Verhindert Caching</li>
+        <li>siehe auch Adaptive Images
+          (<a href="http://adaptive-images.com/">http://adaptive-images.com/</a>)</li>
+      </ul>
+    </section>
+
+    <section class="slide">
+      <h2>&lt;noscript&gt;</h2>
+      <h3>HTML:</h3>
+      <pre><code>&lt;noscript data-large='image.jpg' data-small='image-small.jpg' data-alt='Some image'&gt;
+  &lt;img src='image.jpg' alt='Some image'&gt;
+&lt;/noscript&gt;</code></pre>
+      <h3>JS:</h3>
+      <pre><code>$('noscript[data-large][data-small]').each(function() {
+  var $this = $(this);
+  var src = screen.width &gt;= 500 ?
+    $this.data('large') :
+    $this.data('small');
+  $('&lt;img src="' + src + '" alt="' + $this.data('alt') + '" /&gt;')
+    .insertAfter($this);
+});</code></pre>
+    </section>
+
+    <section class="slide">
+      <h2>&lt;noscript&gt;</h2>
+      <ul>
+        <li>Verhindert mehrfache Downloads</li>
+        <li>Erlaubt Caching</li>
+        <li>Fragwürdige Semantik</li>
+      </ul>
+    </section>
+
+    <section class="slide">
+      <h2>Server-Side UA-Detection</h2>
+      <ul>
+        <li>Konkretes Gerät nicht zuverlässig erkennbar (Bsp. Firefox für Android)</li>
+        <li>Laufender Wartungsaufwand durch neue Geräte</li>
+      </ul>
+    </section>
+
+    <section class="slide">
+      <h2 class="vcenter">Zukunftsmusik</h2>
+    </section>
+
+    <section class="slide">
+      <h2>&lt;picture&gt;</h2>
+      <pre><code>&lt;picture alt="a picture of something"&gt;
+  &lt;!-- Matches by default: --&gt;
+  &lt;source src="mobile.jpg" /&gt;
+  &lt;source src="medium.jpg" media="min-width: 600px" /&gt;
+  &lt;source src="fullsize.jpg" media="min-width: 900px" /&gt;
+
+  &lt;!-- fallback for non-supporting browsers --&gt;
+  &lt;img src="mobile.jpg" /&gt;
+  &lt;/picture&gt;</code></pre>
+      <ul>
+        <li>Vorschlag der
+          <a href="http://www.w3.org/community/respimg/">Responsive Images Community Group</a></li>
+        <li>Aufgeblähter, sich wiederholender Code</li>
+        <li>Darstellungs-Logik (media-queries) in Markup</li>
+      </ul>
+    </section>
+
+    <section class="slide">
+      <h2>srcset</h2>
+      <pre><code>&lt;img alt="image description"
+     src="/path/to/fallbackimage.png"
+     srcset="/path/to/image.png 800w, /path/to/otherimage.png 600w"&gt;</code></pre>
+      <ul>
+        <li>Neue / ungewohnte Syntax</li>
+        <li>Unklare Bedeutung von "800w" (min oder max?)</li>
+        <li>Weniger mächtig als media-queries</li>
+        <li>Darstellungs-Logik in Markup</li>
+      </ul>
+    </section>
+
+    <section class="slide">
+      <h2>Ein neues Dateiformat</h2>
+      <ul>
+        <li>Nur ein herkömmliches &lt;img&gt;-Tag im Markup</li>
+        <li>Browser lädt automatisch nur soviel an Daten herunter, wie benötigt werden</li>
+        <li>Langer Prozess, bis neues Format verbreitet ist (think transparent PNG)</li>
+        <li>Tools zum erstellen solcher Bilder</li>
+      </ul>
+    </section>
+
+    <section class="slide">
+      <h2>Links</h2>
+      <ul>
+        <li><a href="http://dev.opera.com/articles/view/responsive-images-problem/">Responsive images: what's the problem, and how do we fix it?</a></li>
+
+        <li>
+          <a href="http://filamentgroup.com/lab/responsive_images_experimenting_with_context_aware_image_sizing/">Frühe Experimente der filament group</a>
+          (<a href="http://headlondon.com/our-thoughts/technology/posts/responsive-images-a-first-attempt">Follow-up</a>)
+        </li>
+        <li><a href="http://blog.keithclark.co.uk/responsive-images-using-cookies/">Responsive images using cookies</a></li>
+        <li><a href="http://www.headlondon.com/our-thoughts/technology/posts/creating-responsive-images-using-the-noscript-tag">Creating responsive images using the noscript tag</a></li>
+        <li><a href="http://www.alistapart.com/articles/responsive-images-how-they-almost-worked-and-what-we-need/">Responsive Images: How they Almost Worked and What We Need (A List Apart)</a></li>
+
+        <li>
+          <a href="http://blog.cloudfour.com/responsive-imgs/">Auführliche Betrachtungen von Jason Grigsby</a>
+          (<a href="http://blog.cloudfour.com/responsive-imgs-part-2/">Teil 2</a>,
+          <a href="http://blog.cloudfour.com/responsive-imgs-part-3-future-of-the-img-tag/">Teil 3</a>)
+        </li>
+        <li><a href="http://blog.cloudfour.com/the-real-conflict-behind-picture-and-srcset/">The real conflict behind &lt;picture&gt; and @srcset</a></li>
+      </ul>
+      <ul>
+        <li>Folien ...</li>
+      </ul>
+    </section>
+
+
+    <!-- deck.navigation snippet -->
+    <a href="#" class="deck-prev-link" title="Previous">&#8592;</a>
+    <a href="#" class="deck-next-link" title="Next">&#8594;</a>
+
+    <!-- deck.status snippet -->
+    <p class="deck-status">
+      <span class="deck-status-current"></span>
+      /
+      <span class="deck-status-total"></span>
+    </p>
+
+    <!-- deck.goto snippet -->
+    <form action="." method="get" class="goto-form">
+      <label for="goto-slide">Go to slide:</label>
+      <input type="text" name="slidenum" id="goto-slide" list="goto-datalist">
+      <datalist id="goto-datalist"></datalist>
+      <input type="submit" value="Go">
+    </form>
+
+    <!-- deck.hash snippet -->
+    <a href="." title="Permalink to this slide" class="deck-permalink">#</a>
+
+
+    <!-- Grab CDN jQuery, with a protocol relative URL; fall back to local if offline -->
+    <script src="//ajax.aspnetcdn.com/ajax/jQuery/jquery-1.7.min.js"></script>
+    <script>window.jQuery || document.write('<script src="jquery-1.7.min.js"><\/script>')</script>
+
+    <!-- Deck Core and extensions -->
+    <script src="core/deck.core.js"></script>
+    <script src="extensions/hash/deck.hash.js"></script>
+    <script src="extensions/menu/deck.menu.js"></script>
+    <script src="extensions/goto/deck.goto.js"></script>
+    <script src="extensions/status/deck.status.js"></script>
+    <script src="extensions/navigation/deck.navigation.js"></script>
+    <script src="extensions/scale/deck.scale.js"></script>
+
+    <!-- Initialize the deck -->
+    <script>
+      $(function() {
+      $.deck('.slide');
+      });
+    </script>
+  </body>
+</html>
